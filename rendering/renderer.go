@@ -1,25 +1,33 @@
-package main
+package rendering
 
 import (
 	"fmt"
+	"github.com/titasp/PSP_SlidingPuzzle/layout"
 	"strings"
+	"sync"
+)
+
+var (
+	once     sync.Once
+	instance Renderer
 )
 
 type Renderer interface {
-	RenderGrid()
+	Render()
 }
 
-type renderer struct {
-	grid Grid
+type gridRenderer struct {
+	grid layout.Grid
 }
 
-func NewRenderer(gridToRender Grid) Renderer {
-	return &renderer{
-		grid: gridToRender,
-	}
+func NewRenderer(gridToRender layout.Grid) Renderer {
+	once.Do(func() {
+		instance = &gridRenderer{grid: gridToRender}
+	})
+	return instance
 }
 
-func (r *renderer) RenderGrid() {
+func (r *gridRenderer) Render() {
 	for _, row := range r.grid.GetTileGrid() {
 		fmt.Printf("%s+\n", strings.Repeat("+------", r.grid.GetSize()))
 		for _, colItem := range row {

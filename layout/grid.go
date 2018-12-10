@@ -1,4 +1,4 @@
-package main
+package layout
 
 import (
 	"errors"
@@ -10,8 +10,8 @@ import (
 var (
 	ErrInvalidDirection              = errors.New("invalid direction")
 	ErrInvalidTileId                 = errors.New("invalid tile id")
-	ErrInvalidGridSize               = errors.New("invalid grid size, must be larger than 1")
-	ErrInvalidMoveAction_OutOfBounds = errors.New("invalid move action, this would move tile out of grid")
+	ErrInvalidGridSize               = errors.New("invalid layout size, must be larger than 1")
+	ErrInvalidMoveAction_OutOfBounds = errors.New("invalid move action, this would move tile out of layout")
 	ErrInvalidMoveAction_TileBlocked = errors.New("invalid move action, this tile is blocked")
 )
 
@@ -62,11 +62,10 @@ func NewGrid(size int) (Grid, error) {
 		tileIds[i], tileIds[j] = tileIds[j], tileIds[i]
 	})
 
-
 	row := 0
 	col := 0
 
-	// Create tiles and populate grid
+	// Create tiles and populate layout
 	for i := 0; i < size*size; i++ {
 		if i == size*size-1 {
 			gridInstance.tileGrid[row][col] = nil

@@ -1,4 +1,4 @@
-package main
+package input
 
 import (
 	"bufio"
@@ -12,7 +12,7 @@ var (
 	ErrInvalidInput = errors.New("invalid input")
 )
 
-type InputHandler interface {
+type Handler interface {
 	GetCommand() (string, error)
 }
 
@@ -22,7 +22,7 @@ type inputHandler struct {
 	validInputList []string
 }
 
-func NewInputHandler(info string, validInput ...string) InputHandler {
+func NewHandler(info string, validInput ...string) Handler {
 	return &inputHandler{
 		Reader:         bufio.NewReader(os.Stdin),
 		validInputList: validInput,
