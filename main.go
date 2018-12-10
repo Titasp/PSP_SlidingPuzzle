@@ -1,12 +1,15 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/titasp/PSP_SlidingPuzzle/input"
 	"github.com/titasp/PSP_SlidingPuzzle/layout"
 	"github.com/titasp/PSP_SlidingPuzzle/rendering"
+	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -14,12 +17,53 @@ const (
 )
 
 // Strategy pattern
+type textRendererOverrider struct {
+	*textRenderer
+}
+
+func (r *textRendererOverrider) Render() {
+	fmt.Println("hey")
+}
 
 type textRenderer struct {
 }
 
 func (r *textRenderer) Render() {
 	fmt.Println("this is text renderer")
+}
+
+type rnd struct {
+	grid layout.Grid
+}
+
+func (r *rnd) Render() {
+	for _, row := range r.grid.GetTileGrid() {
+		fmt.Printf("%s+\n", strings.Repeat("+======", r.grid.GetSize()))
+		for _, colItem := range row {
+			if colItem != nil {
+				fmt.Printf("|  %2v  ", colItem.GetId())
+			} else {
+				fmt.Printf("|  %2v  ", "%")
+			}
+
+		}
+		fmt.Print("|\n")
+	}
+	fmt.Printf("%s+\n", strings.Repeat("+======", r.grid.GetSize()))
+}
+
+var (
+	rendererType int
+)
+
+func init() {
+	flag.IntVar(&rendererType, "renderer_type", 0, "enter renderer type")
+	flag.Parse()
+
+	if rendererType != 0 && rendererType != 1 {
+		flag.PrintDefaults()
+		log.Fatal("bad renderr type entered")
+	}
 }
 
 func main() {
@@ -32,12 +76,21 @@ func main() {
 	}
 
 	// ======= Singleton pattern =========
-	renderer := rendering.NewRenderer(grid)
-	renderer = rendering.NewRenderer(nil)
+
+	var renderer rendering.Renderer
+	if rendererType == 0 {
+		renderer = rendering.NewRenderer(grid)
+		//renderer = rendering.NewRenderer(nil)
+	} else {
+		renderer = rendering.Renderer(&rnd{grid: grid})
+	}
+
 	// ===================================
 
 	// ======= Strategy pattern (behavioural pattern) =======
-	//renderer = rendering.Renderer(&textRenderer{})
+
+	// Inheritance (embedding)
+	//renderer = rendering.Renderer(&textRendererOverrider{&textRenderer{}})
 
 	// Generate valid id for validation based on configured layout size
 	var validIds []string
