@@ -16,27 +16,16 @@ const (
 	GridSize = 3
 )
 
-// Strategy pattern
-type textRendererOverrider struct {
-	*textRenderer
-}
+var (
+	rendererType int
+)
 
-func (r *textRendererOverrider) Render() {
-	fmt.Println("hey")
-}
-
-type textRenderer struct {
-}
-
-func (r *textRenderer) Render() {
-	fmt.Println("this is text renderer")
-}
-
-type rnd struct {
+// 'otherRenderer' and its usage is for strategy pattern showcase
+type otherRenderer struct {
 	grid layout.Grid
 }
 
-func (r *rnd) Render() {
+func (r *otherRenderer) Render() {
 	for _, row := range r.grid.GetTileGrid() {
 		fmt.Printf("%s+\n", strings.Repeat("+======", r.grid.GetSize()))
 		for _, colItem := range row {
@@ -51,10 +40,6 @@ func (r *rnd) Render() {
 	}
 	fmt.Printf("%s+\n", strings.Repeat("+======", r.grid.GetSize()))
 }
-
-var (
-	rendererType int
-)
 
 func init() {
 	flag.IntVar(&rendererType, "renderer_type", 0, "enter renderer type")
@@ -75,22 +60,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	// ======= Singleton pattern =========
-
 	var renderer rendering.Renderer
 	if rendererType == 0 {
 		renderer = rendering.NewRenderer(grid)
+
+		// ======= Singleton pattern =========
+		// uncommenting of one line bellow shows that singleton pattern is working
+		// and new call for 'NewRenderer' just returns the same instance
 		//renderer = rendering.NewRenderer(nil)
 	} else {
-		renderer = rendering.Renderer(&rnd{grid: grid})
+		renderer = rendering.Renderer(&otherRenderer{grid: grid})
 	}
-
-	// ===================================
-
-	// ======= Strategy pattern (behavioural pattern) =======
-
-	// Inheritance (embedding)
-	//renderer = rendering.Renderer(&textRendererOverrider{&textRenderer{}})
 
 	// Generate valid id for validation based on configured layout size
 	var validIds []string
